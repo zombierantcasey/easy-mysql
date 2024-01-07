@@ -43,7 +43,7 @@ class MysqlExecute:
         return self.pool.get_connection()
 
     def get_single(
-        self, key: str, value: str, database_type: str, table_name: str
+        self, key: str, value: str, table_name: str
     ) -> dict:
         """
         Get a single row from the database.
@@ -61,7 +61,7 @@ class MysqlExecute:
             mysql.connector.Error: If an error occurs during the operation.
         """
 
-        with self.get_connection(database_type) as connection:
+        with self.get_connection() as connection:
             cursor = connection.cursor(dictionary=True)
             query = f"SELECT * FROM {table_name} WHERE {key} = %s LIMIT 1"
             cursor.execute(query, (value,))
@@ -69,7 +69,7 @@ class MysqlExecute:
         return result
 
     def get_multiple(
-        self, key: str, value: str, database_type: str, table_name: str
+        self, key: str, value: str, table_name: str
     ) -> dict:
         """
         Get multiple rows from the database.
@@ -87,7 +87,7 @@ class MysqlExecute:
             mysql.connector.Error: If an error occurs during the operation.
         """
 
-        with self.get_connection(database_type) as connection:
+        with self.get_connection() as connection:
             cursor = connection.cursor(dictionary=True)
             query = f"SELECT * FROM {table_name} WHERE {key} = %s"
             cursor.execute(query, (value,))
@@ -100,7 +100,6 @@ class MysqlExecute:
         search_value: str,
         update_key: str,
         update_value: str,
-        database_type: str,
         table_name: str,
     ) -> bool:
         """
@@ -121,7 +120,7 @@ class MysqlExecute:
             mysql.connector.Error: If an error occurs during the operation.
         """
 
-        with self.get_connection(database_type) as connection:
+        with self.get_connection() as connection:
             cursor = connection.cursor()
             query = f"UPDATE {table_name} SET {update_key} = %s WHERE {search_key} = %s"
             cursor.execute(query, (update_value, search_value))
@@ -129,7 +128,7 @@ class MysqlExecute:
             result = cursor.rowcount > 0
         return result
 
-    def add_entry(self, database_type: str, table_name: str, key_value: dict) -> bool:
+    def add_entry(self, table_name: str, key_value: dict) -> bool:
         """
         Add an entry to the database.
 
@@ -145,7 +144,7 @@ class MysqlExecute:
             mysql.connector.Error: If an error occurs during the operation.
         """
 
-        with self.get_connection(database_type) as connection:
+        with self.get_connection() as connection:
             cursor = connection.cursor()
             columns = ", ".join(key_value.keys())
             placeholders = ", ".join(["%s"] * len(key_value))
@@ -157,7 +156,7 @@ class MysqlExecute:
         return result
 
     def delete_entry(
-        self, key: str, value: str, database_type: str, table_name: str
+        self, key: str, value: str, table_name: str
     ) -> bool:
         """
         Delete an entry from the database.
@@ -175,7 +174,7 @@ class MysqlExecute:
             mysql.connector.Error: If an error occurs during the operation.
         """
 
-        with self.get_connection(database_type) as connection:
+        with self.get_connection() as connection:
             cursor = connection.cursor()
             query = f"DELETE FROM {table_name} WHERE {key} = %s"
             cursor.execute(query, (value,))
