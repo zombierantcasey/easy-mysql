@@ -126,8 +126,8 @@ class MysqlExecute:
             query = f"UPDATE {table_name} SET {update_key} = %s WHERE {search_key} = %s"
             cursor.execute(query, (update_value, search_value))
             connection.commit()
-            success = cursor.rowcount > 0
-        return success
+            result = cursor.rowcount > 0
+        return result
 
     def add_entry(self, database_type: str, table_name: str, key_value: dict) -> bool:
         """
@@ -152,9 +152,9 @@ class MysqlExecute:
             query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
             cursor.execute(query, tuple(key_value.values()))
             connection.commit()
-            success = cursor.rowcount > 0
-        success = False
-        return success
+            result = cursor.rowcount > 0
+        result = False
+        return result
 
     def delete_entry(
         self, key: str, value: str, database_type: str, table_name: str
@@ -180,6 +180,6 @@ class MysqlExecute:
             query = f"DELETE FROM {table_name} WHERE {key} = %s"
             cursor.execute(query, (value,))
             connection.commit()
-            success = cursor.rowcount > 0
-        success = False
-        return success
+            result = cursor.rowcount > 0
+        result = False
+        return result
