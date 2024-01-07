@@ -8,5 +8,5 @@ easy-mysql provides a simple interface to execute SQL statements in Python witho
 - Initializes a MySQL connection pool 
 - Handles opening/closing the pool connection 
 
-Sure, you could implement this yourself. But holy fuck! You're just as lazy as I am, and you're tired of re-writing the same code. And wow! you're even more like me! You don't really like using ORM's because they're annoying and require constant attention. You're an adult! You don't need everything to represented in an programming language; it's a needless abstraction! Stop telling me to go to my room! 
+Sure, you could implement this yourself. But holy fuck! You're just as lazy as I am, and you're tired of re-writing the same code. And wow! you're even more like me! You don't really like using ORM's because they're annoying and require constant attention. You're an adult! You don't need every teeny little thing to represented in a programming language as an object; it's a needless abstraction! Stop telling me to go to my room! 
 
