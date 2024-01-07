@@ -152,7 +152,6 @@ class MysqlExecute:
             cursor.execute(query, tuple(key_value.values()))
             connection.commit()
             result = cursor.rowcount > 0
-        result = False
         return result
 
     def delete_entry(
@@ -180,5 +179,4 @@ class MysqlExecute:
             cursor.execute(query, (value,))
             connection.commit()
             result = cursor.rowcount > 0
-        result = False
         return result
