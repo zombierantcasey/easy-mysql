@@ -2,7 +2,7 @@
 
 ## Introduction 
 
-easy-mysql provides a simple interface to execute SQL statements in Python without the need of an ORM: 
+easy-mysql provides a simple interface to execute SQL statements in Python without the need for an ORM: 
 
 - Covers basic actions such as get_multiple, get_single, add_entry, update_single_field, delete_entry 
 - Initializes a MySQL connection pool 
