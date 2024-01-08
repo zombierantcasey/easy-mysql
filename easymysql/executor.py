@@ -153,6 +153,33 @@ class MysqlExecute:
             connection.commit()
             result = cursor.rowcount > 0
         return result
+    
+    def bulk_insert(self, table_name: str, list_of_key_values: list) -> bool:
+        """
+        Insert multiple entries into the database.
+
+        Args:
+            table_name (str): The name of the table to add entries to.
+            list_of_key_values (list): A list of dictionaries, each representing a row to insert.
+
+        Returns:
+            bool: True if entries were successfully added, False otherwise.
+
+        Raises: 
+            mysql.connector.Error: If an error occurs during the operation.
+        """
+
+        with self.get_connection() as connection:
+            cursor = connection.cursor()
+            if not list_of_key_values:
+                return False
+            columns = ", ".join(list_of_key_values[0].keys())
+            placeholders = ", ".join(["%s"] * len(list_of_key_values[0]))
+            query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+            values_to_insert = [tuple(entry.values()) for entry in list_of_key_values]
+            cursor.executemany(query, values_to_insert)
+            connection.commit()
+            return cursor.rowcount == len(list_of_key_values)
 
     def delete_entry(
         self, key: str, value: str, table_name: str
