@@ -289,3 +289,33 @@ class MysqlExecute:
                 connection.commit()
                 result = cursor.rowcount > 0
         return result
+
+    def execute_query(self, query: str, params: tuple = None, commit: bool = False):
+        """
+        Execute a custom SQL query safely with parameters.
+
+        Args:
+            query (str): SQL query string to execute.
+            params (tuple, optional): Tuple of parameters to pass to the query.
+            commit (bool, optional): Whether to commit the transaction. Defaults to False.
+
+        Returns:
+            list: A list containing the rows returned by the query.
+
+        Raises:
+            MysqlExecuteError: If a database error occurs during the operation.
+        """
+
+        with self.manage_connection() as connection:
+            with connection.cursor(dictionary=True) as cursor:
+                cursor.execute(query, params)
+
+                if query.strip().upper().startswith('SELECT'):
+                    result = cursor.fetchall()
+                else:
+                    result = None
+                    if commit:
+                        connection.commit()
+
+                return result
+
