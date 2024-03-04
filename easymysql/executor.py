@@ -1,5 +1,9 @@
 import mysql.connector
+from typing import List, Dict, Optional
 
+class MysqlExecuteError(Exception):
+    """Custom exception class for MysqlExecute."""
+    pass
 
 class MysqlExecute:
     def __init__(
@@ -41,6 +45,64 @@ class MysqlExecute:
         """
 
         return self.pool.get_connection()
+    
+    def _is_valid_table_or_column(self, table_name: str, column_name: str = None) -> bool:
+        """
+        Check if a table or column exists in the database.
+
+        Args:
+            table_name (str): The name of the table to check.
+            column_name (str, optional): The name of the column to check, if applicable. Defaults to None.
+
+        Raises:
+            e: mysql.connector.Error: If an error occurs during the operation.
+
+        Returns:
+            bool: True if the table or column exists, False otherwise.
+        """
+
+        try:
+            connection = self.pool.get_connection()
+            with connection.cursor() as cursor:
+                if column_name:
+                    cursor.execute(
+                        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
+                        "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s",
+                        (self.db_name, table_name, column_name)
+                    )
+                else:
+                    cursor.execute(
+                        "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES "
+                        "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s",
+                        (self.db_name, table_name)
+                    )
+                result = cursor.fetchone()
+                return result is not None
+        except mysql.connector.Error as e:
+            raise e
+        finally:
+            if connection.is_connected():
+                connection.close()
+
+    def safe_table_column(self, table_name: str, column_name: str = None) -> str:
+        """
+        Prevent SQL Injection by checking if a table or column exists in the database.
+
+        Args:
+            table_name (str): The name of the table to check.
+            column_name (str, optional): The name of the column to check, if applicable. Defaults to None.
+
+        Raises:
+            ValueError: If the table or column does not exist.
+
+        Returns:
+            str: The table or column name.
+        """
+
+        if not self._is_valid_table_or_column(table_name, column_name):
+            raise ValueError("Invalid table or column name.")
+        return table_name if not column_name else f"{table_name}.{column_name}"
+
 
     def get_single(
         self, key: str, value: str, table_name: str
@@ -60,6 +122,9 @@ class MysqlExecute:
         Raises:
             mysql.connector.Error: If an error occurs during the operation.
         """
+
+        table_name = self.safe_table_column(table_name)  
+        key = self.safe_table_column(key)  
 
         with self.get_connection() as connection:
             cursor = connection.cursor(dictionary=True)
@@ -86,6 +151,9 @@ class MysqlExecute:
         Raises:
             mysql.connector.Error: If an error occurs during the operation.
         """
+
+        table_name = self.safe_table_column(table_name)  
+        key = self.safe_table_column(key)  
 
         with self.get_connection() as connection:
             cursor = connection.cursor(dictionary=True)
@@ -120,6 +188,9 @@ class MysqlExecute:
             mysql.connector.Error: If an error occurs during the operation.
         """
 
+        table_name = self.safe_table_column(table_name)  
+        key = self.safe_table_column(key)  
+        
         with self.get_connection() as connection:
             cursor = connection.cursor()
             query = f"UPDATE {table_name} SET {update_key} = %s WHERE {search_key} = %s"
@@ -143,6 +214,9 @@ class MysqlExecute:
         Raises:
             mysql.connector.Error: If an error occurs during the operation.
         """
+
+        table_name = self.safe_table_column(table_name)  
+        key = self.safe_table_column(key) 
 
         with self.get_connection() as connection:
             cursor = connection.cursor()
@@ -168,6 +242,9 @@ class MysqlExecute:
         Raises: 
             mysql.connector.Error: If an error occurs during the operation.
         """
+
+        table_name = self.safe_table_column(table_name)  
+        key = self.safe_table_column(key) 
 
         with self.get_connection() as connection:
             cursor = connection.cursor()
@@ -199,6 +276,9 @@ class MysqlExecute:
         Raises:
             mysql.connector.Error: If an error occurs during the operation.
         """
+
+        table_name = self.safe_table_column(table_name)  
+        key = self.safe_table_column(key) 
 
         with self.get_connection() as connection:
             cursor = connection.cursor()

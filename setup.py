@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="easymysql",
-    version="1.0.4",
+    version="1.0.5",
     author="Pierre MacKay",
     author_email="pierre@propdata.com",
     description="A simple wrapper for mysql-connector-python.",
