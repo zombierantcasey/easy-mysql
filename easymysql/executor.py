@@ -257,10 +257,7 @@ class MysqlExecute:
 
         table_name = self.safe_table_column(table_name)
         search_key = self.safe_table_column(table_name, search_key)
-        columns = ", ".join(
-            "`{}` = %s".format(self.safe_table_column(table_name, column))
-            for column in key_value.keys()
-        )
+        columns = ", ".join("`{}` = %s".format(column) for column in key_value.keys())
 
         with self.manage_connection() as connection:
             with connection.cursor() as cursor:
