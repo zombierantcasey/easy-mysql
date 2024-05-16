@@ -114,7 +114,7 @@ class MysqlExecute:
 
         if not self._is_valid_table_or_column(table_name, column_name):
             raise ValueError("Invalid table or column name.")
-        return table_name if not column_name else f"{table_name}.{column_name}"
+        return table_name if not column_name else column_name
 
     def get_single(self, key: str, value: str, table_name: str) -> dict:
         """
@@ -256,7 +256,6 @@ class MysqlExecute:
         """
 
         table_name = self.safe_table_column(table_name)
-        search_key = self.safe_table_column(table_name, search_key)
         columns = ", ".join("`{}` = %s".format(column) for column in key_value.keys())
 
         with self.manage_connection() as connection:
