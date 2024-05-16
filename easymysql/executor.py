@@ -236,8 +236,7 @@ class MysqlExecute:
         self,
         search_key: str,
         search_value: str,
-        update_key: str,
-        update_value: str,
+        key_value: dict,
         table_name: str,
     ) -> bool:
         """
@@ -246,8 +245,7 @@ class MysqlExecute:
         Args:
             search_key (str): The column name to search.
             search_value (str): The value to search for.
-            update_key (str): The column name to update.
-            update_value (str): The value to update to.
+            key_value (dict): A dictionary containing the column names and values to update.
             table_name (str): The name of the table to search.
 
         Returns:
@@ -259,18 +257,20 @@ class MysqlExecute:
 
         table_name = self.safe_table_column(table_name)
         search_key = self.safe_table_column(table_name, search_key)
-        update_key = self.safe_table_column(table_name, update_key)
+        columns = ", ".join(
+            "`{}` = %s".format(self.safe_table_column(table_name, column))
+            for column in key_value.keys()
+        )
 
         with self.manage_connection() as connection:
             with connection.cursor() as cursor:
-                query = "UPDATE `{}` SET `{}` = %s WHERE `{}` = %s".format(
-                    table_name, update_key, search_key
+                query = "UPDATE `{}` SET {} WHERE `{}` = %s".format(
+                    table_name, columns, search_key
                 )
-                cursor.execute(query, (update_value, search_value))
+                cursor.execute(query, tuple(key_value.values()) + (search_value,))
                 connection.commit()
                 result = cursor.rowcount > 0
         return result
-    
 
     def add_entry(self, table_name: str, key_value: dict) -> bool:
         """
