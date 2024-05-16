@@ -169,6 +169,29 @@ class MysqlExecute:
                 cursor.execute(query, (value,))
                 result = cursor.fetchall()
         return result
+    
+    def get_all(self, table_name: str) -> list:
+        """
+        Get all rows from the database.
+
+        Args:
+            table_name (str): The name of the table to search.
+
+        Returns:
+            list: A list of dictionaries containing the row data.
+
+        Raises:
+            mysql.connector.Error: If an error occurs during the operation.
+        """
+
+        table_name = self.safe_table_column(table_name)
+
+        with self.manage_connection() as connection:
+            with connection.cursor(dictionary=True) as cursor:
+                query = "SELECT * FROM `{}`".format(table_name)
+                cursor.execute(query)
+                result = cursor.fetchall()
+        return result
 
     def update_single_field(
         self,
