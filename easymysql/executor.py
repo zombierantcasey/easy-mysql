@@ -231,6 +231,46 @@ class MysqlExecute:
                 connection.commit()
                 result = cursor.rowcount > 0
         return result
+    
+    def update_multiple_fields(
+        self,
+        search_key: str,
+        search_value: str,
+        update_key: str,
+        update_value: str,
+        table_name: str,
+    ) -> bool:
+        """
+        Update a multiple fields in a single row.
+
+        Args:
+            search_key (str): The column name to search.
+            search_value (str): The value to search for.
+            update_key (str): The column name to update.
+            update_value (str): The value to update to.
+            table_name (str): The name of the table to search.
+
+        Returns:
+            bool: True if the entry was successfully updated, False otherwise.
+
+        Raises:
+            mysql.connector.Error: If an error occurs during the operation.
+        """
+
+        table_name = self.safe_table_column(table_name)
+        search_key = self.safe_table_column(table_name, search_key)
+        update_key = self.safe_table_column(table_name, update_key)
+
+        with self.manage_connection() as connection:
+            with connection.cursor() as cursor:
+                query = "UPDATE `{}` SET `{}` = %s WHERE `{}` = %s".format(
+                    table_name, update_key, search_key
+                )
+                cursor.execute(query, (update_value, search_value))
+                connection.commit()
+                result = cursor.rowcount > 0
+        return result
+    
 
     def add_entry(self, table_name: str, key_value: dict) -> bool:
         """
