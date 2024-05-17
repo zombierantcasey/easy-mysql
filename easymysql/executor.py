@@ -170,6 +170,31 @@ class MysqlExecute:
                 result = cursor.fetchall()
         return result
     
+    def get_multiple_by_multiple(self, key_value: dict, table_name: str) -> list:
+        """
+        Get multiple rows from the database by multiple keys.
+
+        Args:
+            key_value (dict): A dictionary containing the column names and values to search.
+            table_name (str): The name of the table to search.
+
+        Returns:
+            list: A list of dictionaries containing the row data.
+
+        Raises:
+            mysql.connector.Error: If an error occurs during the operation.
+        """
+
+        table_name = self.safe_table_column(table_name)
+        columns = " AND ".join("`{}` = %s".format(column) for column in key_value.keys())
+
+        with self.manage_connection() as connection:
+            with connection.cursor(dictionary=True) as cursor:
+                query = "SELECT * FROM `{}` WHERE {}".format(table_name, columns)
+                cursor.execute(query, tuple(key_value.values()))
+                result = cursor.fetchall()
+        return result
+    
     def get_all(self, table_name: str) -> list:
         """
         Get all rows from the database.
