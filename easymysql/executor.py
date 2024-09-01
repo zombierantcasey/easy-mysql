@@ -17,21 +17,33 @@ class MysqlExecute:
         db_password: str,
         db_name: str,
         pool_size: int = 3,
+        is_mariadb: bool = False
     ):
         self.db_host = db_host
         self.db_port = db_port
         self.db_user = db_user
         self.db_password = db_password
         self.db_name = db_name
+        self.is_mariadb = is_mariadb
+
+        config = {
+            'host': self.db_host,
+            'port': self.db_port,
+            'user': self.db_user,
+            'password': self.db_password,
+            'database': self.db_name,
+        }
+
+        if self.is_mariadb:
+            config.update({
+                'charset': 'utf8mb4',
+                'collation': 'utf8mb4_general_ci'
+            })
 
         self.pool = mysql.connector.pooling.MySQLConnectionPool(
             pool_name=f"{self.db_name}_pool",
             pool_size=pool_size,
-            host=self.db_host,
-            port=self.db_port,
-            user=self.db_user,
-            password=self.db_password,
-            database=self.db_name,
+            **config
         )
 
     @contextmanager
